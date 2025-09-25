@@ -15,12 +15,18 @@ A simple Minecraft plugin to hide player names and show them on right-click in a
 
 
 ```yml
-# display time in seconds
+# display time in seconds (min 1s)
 display-time: 3
 
 # Change nickname format here
 # Use & for colors or HEX (#RRGGBB) and {PLAYER_NAME} variable
 name-format: "&a&l{PLAYER_NAME}"
+
+# If true, plugin will NOT show nametag when the target player is invisible
+respect-invisibility: false
+
+# Where to display the nickname: "actionbar" (default) or "subtitle"
+display-location: "actionbar"
 ```
 
 

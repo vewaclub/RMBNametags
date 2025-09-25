@@ -22,6 +22,12 @@ display-time: 3
 # Изменить формат отображения никнейма можно здесь
 # Используйте & для цветов или HEX (#RRGGBB) и переменную {PLAYER_NAME} 
 name-format: "&a&l{PLAYER_NAME}"
+
+# Если стоит true, плагин не будет показывать ники если игрок невидимый
+respect-invisibility: false
+
+# Где отображать никнейм: "actionbar" (стандартное) или "subtitle"
+display-location: "actionbar"
 ```
 
 

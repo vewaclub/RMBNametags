@@ -12,52 +12,77 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.bukkit.potion.PotionEffectType;
 import org.bstats.bukkit.Metrics;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RMBNametags extends JavaPlugin implements Listener {
 
+    private enum DisplayLocation {
+        ACTIONBAR, SUBTITLE;
+
+        static DisplayLocation fromConfig(String raw) {
+            if (raw == null) return ACTIONBAR;
+            switch (raw.trim().toUpperCase(Locale.ROOT)) {
+                case "SUBTITLE": return SUBTITLE;
+                case "ACTIONBAR":
+                default: return ACTIONBAR;
+            }
+        }
+    }
+
+    private static final Pattern HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]{6})");
+
     private Scoreboard board;
     private Team hiddenNamesTeam;
-    private int displayTime;
+
+    private int displayTimeSeconds;
     private String nameFormat;
+    private boolean respectInvisibility;            // dont show invisible players name
+    private DisplayLocation displayLocation;        // where to show nickname
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         loadConfig();
-        getLogger().info("Config loaded: display-time=" + displayTime + "s, format=" + nameFormat);
 
-        // BStats
+        // bStats
         new Metrics(this, 22888);
 
+        // events and reloadcommand
         getServer().getPluginManager().registerEvents(this, this);
-        getCommand("rmbnametags_reload").setExecutor(new ReloadCommand(this));
-        getLogger().info("Events and command registered successfully.");
+        if (getCommand("rmbnametags_reload") != null) {
+            getCommand("rmbnametags_reload").setExecutor(new ReloadCommand(this));
+        }
 
         board = Bukkit.getScoreboardManager().getNewScoreboard();
         hiddenNamesTeam = board.registerNewTeam("hiddenNames");
         hiddenNamesTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
-        getLogger().info("Custom scoreboard created, hiddenNames team registered.");
+        hiddenNamesTeam.setCanSeeFriendlyInvisibles(false);
 
+        // hide online players nicknames
         for (Player player : Bukkit.getOnlinePlayers()) {
             hidePlayerName(player);
         }
+
+        getLogger().info(() -> String.format(
+                "Config loaded: display-time=%ds, format=%s, respect-invisibility=%s, display-location=%s",
+                displayTimeSeconds, nameFormat, respectInvisibility, displayLocation));
     }
 
     @Override
-    public void onDisable() {
-        // Scoreboard создан самим плагином — ничего вручную чистить не нужно
-    }
+    public void onDisable() {}
 
     public void loadConfig() {
         reloadConfig();
-        FileConfiguration config = getConfig();
-        displayTime = config.getInt("display-time", 3);
-        // Храним формат как есть; обработаем цвета (HEX и &-) при показе
-        nameFormat = config.getString("name-format", "&6{PLAYER_NAME}");
+        FileConfiguration cfg = getConfig();
+        displayTimeSeconds   = Math.max(0, cfg.getInt("display-time", 3));
+        nameFormat           = cfg.getString("name-format", "&6{PLAYER_NAME}");
+        respectInvisibility  = cfg.getBoolean("respect-invisibility", true);
+        displayLocation      = DisplayLocation.fromConfig(cfg.getString("display-location", "actionbar"));
     }
 
     @EventHandler
@@ -66,49 +91,58 @@ public class RMBNametags extends JavaPlugin implements Listener {
     }
 
     private void hidePlayerName(Player player) {
-        hiddenNamesTeam.addEntry(player.getName());
+        if (!hiddenNamesTeam.hasEntry(player.getName())) {
+            hiddenNamesTeam.addEntry(player.getName());
+        }
         player.setScoreboard(board);
     }
 
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        if (!(event.getRightClicked() instanceof Player)) {
-            return;
-        }
+        if (!(event.getRightClicked() instanceof Player)) return;
+
         Player clickedPlayer = (Player) event.getRightClicked();
-        if (clickedPlayer.isInvisible()) {
-            return;
+        if (respectInvisibility && isEffectivelyInvisible(clickedPlayer)) return;
+
+        showConfigured(event.getPlayer(), clickedPlayer);
+    }
+
+
+    private boolean isEffectivelyInvisible(Player player) {
+        return player.hasPotionEffect(PotionEffectType.INVISIBILITY) || player.isInvisible();
+    }
+
+    // show nickname according to display-location
+    private void showConfigured(Player viewer, Player target) {
+        String formatted = colorize(nameFormat.replace("{PLAYER_NAME}", target.getName()));
+
+        switch (displayLocation) {
+            case SUBTITLE:
+                int stay = Math.max(1, displayTimeSeconds) * 20;
+                viewer.sendTitle("", formatted, 0, stay, 10);
+                break;
+
+            case ACTIONBAR:
+            default:
+                viewer.sendActionBar(formatted);
+                if (displayTimeSeconds > 0) {
+                    new BukkitRunnable() {
+                        @Override public void run() { viewer.sendActionBar(""); }
+                    }.runTaskLater(this, displayTimeSeconds * 20L);
+                }
+                break;
         }
-        Player clickingPlayer = event.getPlayer();
-        showPlayerNameInActionbar(clickingPlayer, clickedPlayer);
     }
 
-    private void showPlayerNameInActionbar(Player clickingPlayer, Player clickedPlayer) {
-        String formattedName = colorize(nameFormat.replace("{PLAYER_NAME}", clickedPlayer.getName()));
-
-        clickingPlayer.sendActionBar(formattedName);
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                clickingPlayer.sendActionBar("");
-            }
-        }.runTaskLater(this, displayTime * 20L); // секунды → тики
-    }
-
-    // Поддержка HEX цветов (#RRGGBB) + стандартных &-кодов
+    // HEX support
     private String colorize(String input) {
-        // HEX (#RRGGBB) → §x§R§R§G§G§B§B через Bungee ChatColor.of()
-        Pattern hexPattern = Pattern.compile("#([A-Fa-f0-9]{6})");
-        Matcher matcher = hexPattern.matcher(input);
-        StringBuffer buffer = new StringBuffer();
-        while (matcher.find()) {
-            String color = matcher.group(1);
-            matcher.appendReplacement(buffer, ChatColor.of("#" + color).toString());
+        Matcher m = HEX_PATTERN.matcher(input);
+        StringBuffer buf = new StringBuffer();
+        while (m.find()) {
+            String color = m.group(1);
+            m.appendReplacement(buf, ChatColor.of("#" + color).toString());
         }
-        matcher.appendTail(buffer);
-
-        // Затем переводим &-коды (&a, &l и т.д.)
-        return org.bukkit.ChatColor.translateAlternateColorCodes('&', buffer.toString());
+        m.appendTail(buf);
+        return org.bukkit.ChatColor.translateAlternateColorCodes('&', buf.toString());
     }
 }

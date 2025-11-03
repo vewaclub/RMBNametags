@@ -128,7 +128,7 @@ public class RMBNametags extends JavaPlugin implements Listener {
 
         if (HAS_PLACEHOLDER) {
             formatted = PlaceholderAPI.setPlaceholders(target, formatted); // support Placeholders
-            formatted = PlaceholderAPI.setRelationalPlaceholders(viewer,target,formatted);
+            formatted = PlaceholderAPI.setRelationalPlaceholders(viewer,target,formatted); // and rel placeholders
         }
 
         switch (displayLocation) {

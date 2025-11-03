@@ -10,3 +10,8 @@ respect-invisibility: false
 
 # Where to display the nickname: "actionbar" (default) or "subtitle"
 display-location: "actionbar"
+
+# Some messages
+Messages:
+  Reload: "&a&lSuccessful reload!"
+  Not-Reload: "&c&lNot successful reload"

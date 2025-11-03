@@ -13,7 +13,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.potion.PotionEffectType;
+
 import org.bstats.bukkit.Metrics;
+import me.clip.placeholderapi.PlaceholderAPI;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -44,6 +46,8 @@ public class RMBNametags extends JavaPlugin implements Listener {
     private boolean respectInvisibility;            // dont show invisible players name
     private DisplayLocation displayLocation;        // where to show nickname
 
+    private boolean HAS_PLACEHOLDER = false;
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
@@ -54,8 +58,13 @@ public class RMBNametags extends JavaPlugin implements Listener {
 
         // events and reloadcommand
         getServer().getPluginManager().registerEvents(this, this);
-        if (getCommand("rmbnametags_reload") != null) {
-            getCommand("rmbnametags_reload").setExecutor(new ReloadCommand(this));
+        if (getCommand("rmbnametags") != null) {
+            getCommand("rmbnametags").setExecutor(new ReloadCommand(this));
+        }
+
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            HAS_PLACEHOLDER = true;
+            getLogger().info("PlaceholderAPI expansion registered!");
         }
 
         board = Bukkit.getScoreboardManager().getNewScoreboard();
@@ -74,7 +83,9 @@ public class RMBNametags extends JavaPlugin implements Listener {
     }
 
     @Override
-    public void onDisable() {}
+    public void onDisable() {
+        board.getTeam(hiddenNamesTeam.getName()).unregister();
+    }
 
     public void loadConfig() {
         reloadConfig();
@@ -99,10 +110,9 @@ public class RMBNametags extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-        if (!(event.getRightClicked() instanceof Player)) return;
+        if (!(event.getRightClicked() instanceof Player clickedPlayer)) return;
 
-        Player clickedPlayer = (Player) event.getRightClicked();
-        if (respectInvisibility && isEffectivelyInvisible(clickedPlayer)) return;
+        if (respectInvisibility && isEffectivelyInvisible(clickedPlayer) || event.getPlayer().isSneaking()) return;
 
         showConfigured(event.getPlayer(), clickedPlayer);
     }
@@ -116,6 +126,11 @@ public class RMBNametags extends JavaPlugin implements Listener {
     private void showConfigured(Player viewer, Player target) {
         String formatted = colorize(nameFormat.replace("{PLAYER_NAME}", target.getName()));
 
+        if (HAS_PLACEHOLDER) {
+            formatted = PlaceholderAPI.setPlaceholders(target, formatted); // support Placeholders
+            formatted = PlaceholderAPI.setRelationalPlaceholders(viewer,target,formatted);
+        }
+
         switch (displayLocation) {
             case SUBTITLE:
                 int stay = Math.max(1, displayTimeSeconds) * 20;
@@ -124,6 +139,7 @@ public class RMBNametags extends JavaPlugin implements Listener {
 
             case ACTIONBAR:
             default:
+
                 viewer.sendActionBar(formatted);
                 if (displayTimeSeconds > 0) {
                     new BukkitRunnable() {
@@ -137,7 +153,7 @@ public class RMBNametags extends JavaPlugin implements Listener {
     // HEX support
     private String colorize(String input) {
         Matcher m = HEX_PATTERN.matcher(input);
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         while (m.find()) {
             String color = m.group(1);
             m.appendReplacement(buf, ChatColor.of("#" + color).toString());

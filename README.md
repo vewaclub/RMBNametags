@@ -7,7 +7,8 @@
 [![Modrinth](https://raw.githubusercontent.com/gist/jenchanws/842eee8428e1e0aec20de4594878156a/raw/0dbefc2fcbec362d14f1689acb807183ceffdbe1/modrinth.svg)](https://modrinth.com/plugin/rmbnametags)
 
 
-A simple Minecraft plugin to hide player names and show them on right-click in actionbar
+A simple Minecraft plugin to hide player names and show them on right-click in actionbar.
+PlaceholderAPI supported include Relational placeholders.
 
 ![Nickname pops up in actionbar when you press rmb](https://cdn.modrinth.com/data/cached_images/3232f03c8108ea611b1bdf8b42e6ce3320641d7c.png)
 
@@ -27,6 +28,11 @@ respect-invisibility: false
 
 # Where to display the nickname: "actionbar" (default) or "subtitle"
 display-location: "actionbar"
+
+# Some messages for Reload command
+Messages:
+ Reload: "&a&lSuccessful reload!"
+ Not-Reload: "&c&lNot successful reload"
 ```
 
 

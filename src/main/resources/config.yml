@@ -3,7 +3,7 @@ display-time: 3
 
 # Change nickname format here
 # Use & for colors or HEX (#RRGGBB) and {PLAYER_NAME} variable
-name-format: "&a&l{PLAYER_NAME}"
+name-format: "&a{PLAYER_NAME}"
 
 # If true, plugin will NOT show nametag when the target player is invisible
 respect-invisibility: false
@@ -11,7 +11,7 @@ respect-invisibility: false
 # Where to display the nickname: "actionbar" (default) or "subtitle"
 display-location: "actionbar"
 
-# Some messages
+# Translations
 Messages:
-  Reload: "&a&lSuccessful reload!"
-  Not-Reload: "&c&lNot successful reload"
+  Reload: "&aRMBNametags config reloaded!"
+  Not-Reload: "&cAn error occurred during a config reload"

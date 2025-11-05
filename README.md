@@ -8,7 +8,7 @@
 
 
 A simple Minecraft plugin to hide player names and show them on right-click in actionbar.
-PlaceholderAPI supported include Relational placeholders.
+PlaceholderAPI support include Relational placeholders.
 
 ![Nickname pops up in actionbar when you press rmb](https://cdn.modrinth.com/data/cached_images/3232f03c8108ea611b1bdf8b42e6ce3320641d7c.png)
 
@@ -29,10 +29,10 @@ respect-invisibility: false
 # Where to display the nickname: "actionbar" (default) or "subtitle"
 display-location: "actionbar"
 
-# Some messages for Reload command
+# Translations
 Messages:
- Reload: "&a&lSuccessful reload!"
- Not-Reload: "&c&lNot successful reload"
+ Reload: "&aRMBNametags config reloaded!"
+ Not-Reload: "&cAn error occurred during a config reload"
 ```
 
 

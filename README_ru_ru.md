@@ -9,7 +9,7 @@
 
 
 Простой плагин для Minecraft, который скрывает ники игроков и показывает их при нажатии правой кнопкой мыши в actionbar.
-Наличие поддежки Placeholders, включая Relational.
+Поддержка PlaceholderAPI, включая Relational плейсхолдеры.
 
 ![Никнейм всплывает в actionbar, когда вы нажимаете ПКМ](https://cdn.modrinth.com/data/cached_images/3232f03c8108ea611b1bdf8b42e6ce3320641d7c.png)
 
@@ -30,10 +30,10 @@ respect-invisibility: false
 # Где отображать никнейм: "actionbar" (стандартное) или "subtitle"
 display-location: "actionbar"
 
-# Стандартные сообщения при команде reload
+# Переводы
 Messages:
-  Reload: "&a&lSuccessful reload!"
-  Not-Reload: "&c&lNot successful reload"
+  Reload: "&aRMBNametags config reloaded!"
+  Not-Reload: "&cAn error occurred during a config reload"
 ```
 
 

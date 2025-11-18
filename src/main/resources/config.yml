@@ -23,7 +23,7 @@ Messages:
   Not-Reload: "&c&lNot successful reload"
   No-Permission: "&cYou don't have permission to use this command!"
   Player-Not-Found: "&cPlayer not found or offline!"
-  Console-Must-Specify-Player: "&cConsole must specify a player!"
+  Console-Specify-Player: "&cConsole must specify a player!"
   Hide-Self: "&aYour nickname is now hidden"
   Hide-Other: "&aNickname of player %player% is now hidden"
   Show-Self: "&aYour nickname is now visible"

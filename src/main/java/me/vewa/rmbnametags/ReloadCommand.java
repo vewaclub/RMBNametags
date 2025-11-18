@@ -93,7 +93,7 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
         } else {
             // if without player - set himself
             if (!(sender instanceof Player)) {
-                sendMessage(sender, "Console-Must-Specify-Player");
+                sendMessage(sender, "Console-Specify-Player");
                 return;
             }
             targetPlayer = (Player) sender;
@@ -131,7 +131,7 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
         if (success && targetPlayer != sender) {
             if (hide) {
                 if (customName != null) {
-                    targetPlayer.sendMessage(colorize(plugin.getConfig().getString("Messages.Hide-Custom-Other-Target", "&aYour nickname is now hidden with custom name: %custom_name%").replace("%custom_name%", customName)));
+                    targetPlayer.sendMessage(colorize(plugin.getConfig().getString("Messages.Hide-Custom-Self", "&aYour nickname is now hidden with custom name: %custom_name%").replace("%custom_name%", customName)));
                 } else {
                     sendMessage(targetPlayer, "Hide-Self");
                 }

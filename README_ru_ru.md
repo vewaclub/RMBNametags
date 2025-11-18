@@ -18,7 +18,7 @@
 - Поддержка PlaceholderAPI с реляционными плейсхолдерами
 - Кастомные имена для скрытых игроков
 - Команды скрытия/показа с кастомными именами
-- Опция уважения невидимости
+- Опция проверки невидимости
 - Многоязычные сообщения
 
 ## Команды
@@ -79,3 +79,6 @@ Messages:
   Already-Hidden: "&cНик игрока %player% уже скрыт"
   Already-Visible: "&cНик игрока %player% уже виден"
 ```
+
+### bStats
+[![Статистика использования плагина на bStats](https://bstats.org/signatures/bukkit/RMBNametags.svg)](https://bstats.org/plugin/bukkit/RMBNametags)

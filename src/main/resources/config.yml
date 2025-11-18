@@ -5,13 +5,30 @@ display-time: 3
 # Use & for colors or HEX (#RRGGBB) and {PLAYER_NAME} variable
 name-format: "&a&l{PLAYER_NAME}"
 
+# Format for hidden players (if empty, nothing will be shown)
+hide-name-format: "&a&lUnknown"
+
 # If true, plugin will NOT show nametag when the target player is invisible
 respect-invisibility: false
 
 # Where to display the nickname: "actionbar" (default) or "subtitle"
 display-location: "actionbar"
 
-# Some messages
+# If true, hidden players will still show their custom name when clicked
+show-hidden-players: true
+
+# Translations
 Messages:
   Reload: "&a&lSuccessful reload!"
   Not-Reload: "&c&lNot successful reload"
+  No-Permission: "&cYou don't have permission to use this command!"
+  Player-Not-Found: "&cPlayer not found or offline!"
+  Console-Must-Specify-Player: "&cConsole must specify a player!"
+  Hide-Self: "&aYour nickname is now hidden"
+  Hide-Other: "&aNickname of player %player% is now hidden"
+  Show-Self: "&aYour nickname is now visible"
+  Show-Other: "&aNickname of player %player% is now visible"
+  Already-Hidden: "&cNickname of player %player% is already hidden"
+  Already-Visible: "&cNickname of player %player% is already visible"
+  Hide-Custom-Self: "&aYour nickname is now hidden with custom name: %custom_name%"
+  Hide-Custom-Other: "&aNickname of player %player% is now hidden with custom name: %custom_name%"

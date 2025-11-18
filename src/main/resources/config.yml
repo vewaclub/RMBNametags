@@ -3,7 +3,7 @@ display-time: 3
 
 # Change nickname format here
 # Use & for colors or HEX (#RRGGBB) and {PLAYER_NAME} variable
-name-format: "&a&l{PLAYER_NAME}"
+name-format: "&a{PLAYER_NAME}"
 
 # Format for hidden players (if empty, nothing will be shown)
 hide-name-format: "&a&lUnknown"

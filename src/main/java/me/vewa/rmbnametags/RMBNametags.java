@@ -47,11 +47,11 @@ public class RMBNametags extends JavaPlugin implements Listener {
     private DisplayLocation displayLocation;        // where to show nickname
 
     private boolean HAS_PLACEHOLDER = false;
-
+    
     private final Map<UUID, String> hiddenPlayers = new HashMap<>(); // hide player with custom text or not
     private @Nullable String hideNameFormat;
     private boolean showHiddenPlayers;
-
+  
     @Override
     public void onEnable() {
         saveDefaultConfig();

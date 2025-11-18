@@ -7,7 +7,8 @@
 
 [![Modrinth](https://raw.githubusercontent.com/gist/jenchanws/842eee8428e1e0aec20de4594878156a/raw/0dbefc2fcbec362d14f1689acb807183ceffdbe1/modrinth.svg)](https://modrinth.com/plugin/rmbnametags)
 
-A simple Minecraft plugin to hide player names and show them on right-click in actionbar. PlaceholderAPI supported include Relational placeholders.
+A simple Minecraft plugin to hide player names and show them on right-click in actionbar.
+PlaceholderAPI support include Relational placeholders.
 
 ![Nickname pops up in actionbar when you press rmb](https://cdn.modrinth.com/data/cached_images/3232f03c8108ea611b1bdf8b42e6ce3320641d7c.png)
 
@@ -78,3 +79,4 @@ Messages:
   Hide-Custom-Other: "&aPlayer %player%'s nickname is now hidden with custom name: %custom_name%"
   Already-hidden: "&cPlayer %player%'s nickname is already hidden"
   Already-Visible: "&cPlayer %player%'s nickname is already visible"
+```

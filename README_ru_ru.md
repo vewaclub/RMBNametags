@@ -78,3 +78,4 @@ Messages:
   Hide-Custom-Other: "&aНик игрока %player% теперь скрыт с кастомным именем: %custom_name%"
   Already-Hidden: "&cНик игрока %player% уже скрыт"
   Already-Visible: "&cНик игрока %player% уже виден"
+```

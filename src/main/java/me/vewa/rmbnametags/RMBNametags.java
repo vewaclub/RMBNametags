@@ -200,6 +200,11 @@ public class RMBNametags extends JavaPlugin implements Listener {
     }
 
     public boolean hidePlayer(Player player, String customName) {
+        // if player hidden with config format and no new customName -> false
+        if (isPlayerHidden(player) && customName == null && getHiddenPlayerName(player) == null) {
+            return false;
+        }
+
         // Null means using format from config
         hiddenPlayers.put(player.getUniqueId(), Objects.requireNonNullElse(customName, ""));
         return true;

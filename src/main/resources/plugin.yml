@@ -4,11 +4,20 @@ main: me.vewa.rmbnametags.RMBNametags
 api-version: '1.21'
 description: A plugin to hide player names and show them on right-click in actionbar
 softdepend: ["PlaceholderAPI"]
-permissions:
-  rmbnametags.reload:
-    default: op
 commands:
   rmbnametags:
-    reload:
-      usage: /rmbnametags <reload>
-      permission: rmbnametags.reload
+    description: Manage nametags
+    usage: /<command> [reload|hide|show]
+permissions:
+  rmbnametags.reload:
+    description: Permission to reload config
+    default: op
+  rmbnametags.hide-show:
+    description: Permission to hide or show own nametag
+    default: true
+  rmbnametags.hide-show.other:
+    description: Permission to hide or show other players nametags
+    default: op
+  rmbnametags.hide.custom:
+    description: Permission to set custom names when hiding
+    default: op

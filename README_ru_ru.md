@@ -1,4 +1,4 @@
-[🇺🇺🇸Read on English](https://github.com/vewaclub/RMBNametags/blob/master/README.md)
+[🇺🇸Read on English](https://github.com/vewaclub/RMBNametags/blob/master/README.md)
 
 # RMBNametags
 

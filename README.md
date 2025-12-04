@@ -64,8 +64,8 @@ show-hidden-players: true
 
 # Messages (English by default)
 Messages:
-  Reload: "&a&lConfig reloaded successfully!"
-  Not-Reload: "&c&lFailed to reload config!"
+  Reload: "&a&lRMBNametags config reloaded!"
+  Not-Reload: "&c&lAn error occurred during a config reload"
   No-Permission: "&cYou don't have permission to use this command!"
   Player-Not-Found: "&cPlayer not found or offline!"
   Console-Specify-Player: "&cConsole must specify a player!"

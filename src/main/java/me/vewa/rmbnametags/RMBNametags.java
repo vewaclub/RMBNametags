@@ -41,26 +41,26 @@ public class RMBNametags extends JavaPlugin implements Listener {
     private Scoreboard board;
     private Team hiddenNamesTeam;
 
+    private WolfNametagManager wolfNametagManager;
+
     private int displayTimeSeconds;
     private String nameFormat;
-    private boolean respectInvisibility;            // dont show invisible players name
-    private DisplayLocation displayLocation;        // where to show nickname
+    private boolean respectInvisibility;
+    private DisplayLocation displayLocation;
 
     private boolean HAS_PLACEHOLDER = false;
-    
-    private final Map<UUID, String> hiddenPlayers = new HashMap<>(); // hide player with custom text or not
+
+    private final Map<UUID, String> hiddenPlayers = new HashMap<>();
     private @Nullable String hideNameFormat;
     private boolean showHiddenPlayers;
-  
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
         loadConfig();
 
-        // bStats
         new Metrics(this, 22888);
 
-        // events and reloadcommand
         getServer().getPluginManager().registerEvents(this, this);
         if (getCommand("rmbnametags") != null) {
             getCommand("rmbnametags").setExecutor(new ReloadCommand(this));
@@ -76,7 +76,9 @@ public class RMBNametags extends JavaPlugin implements Listener {
         hiddenNamesTeam.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
         hiddenNamesTeam.setCanSeeFriendlyInvisibles(false);
 
-        // hide online players nicknames
+        wolfNametagManager = new WolfNametagManager(this, board);
+        getServer().getPluginManager().registerEvents(wolfNametagManager, this);
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             hidePlayerName(player);
         }
@@ -88,23 +90,28 @@ public class RMBNametags extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        if (wolfNametagManager != null) {
+            wolfNametagManager.cleanup();
+        }
         board.getTeam(hiddenNamesTeam.getName()).unregister();
     }
 
     public void loadConfig() {
         reloadConfig();
         FileConfiguration cfg = getConfig();
-        displayTimeSeconds   = Math.max(0, cfg.getInt("display-time", 3));
-        nameFormat           = cfg.getString("name-format", "&6{PLAYER_NAME}");
-        hideNameFormat       = cfg.getString("hide-name-format", "&a&lUnknown");
-        respectInvisibility  = cfg.getBoolean("respect-invisibility", true);
-        displayLocation      = DisplayLocation.fromConfig(cfg.getString("display-location", "actionbar"));
-        showHiddenPlayers    = cfg.getBoolean("show-hidden-players", true);
+        displayTimeSeconds  = Math.max(0, cfg.getInt("display-time", 3));
+        nameFormat          = cfg.getString("name-format", "&6{PLAYER_NAME}");
+        hideNameFormat      = cfg.getString("hide-name-format", "&a&lUnknown");
+        respectInvisibility = cfg.getBoolean("respect-invisibility", true);
+        displayLocation     = DisplayLocation.fromConfig(cfg.getString("display-location", "actionbar"));
+        showHiddenPlayers   = cfg.getBoolean("show-hidden-players", true);
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        hidePlayerName(event.getPlayer());
+        Player player = event.getPlayer();
+        hidePlayerName(player);
+        wolfNametagManager.reRegisterWolvesOwnedBy(player);
     }
 
     private void hidePlayerName(Player player) {
@@ -133,7 +140,6 @@ public class RMBNametags extends JavaPlugin implements Listener {
         showConfigured(viewer, clickedPlayer);
     }
 
-
     private boolean isEffectivelyInvisible(Player player) {
         return player.hasPotionEffect(PotionEffectType.INVISIBILITY) || player.isInvisible();
     }
@@ -142,11 +148,9 @@ public class RMBNametags extends JavaPlugin implements Listener {
         String customName = getHiddenPlayerName(target);
 
         if (customName != null) {
-            // custom name
             String displayText = processDisplayText(viewer, target, customName);
             showText(viewer, displayText);
         } else {
-            // format from config
             if (hideNameFormat != null && !hideNameFormat.isEmpty()) {
                 String formattedText = hideNameFormat.replace("{PLAYER_NAME}", target.getName());
                 String displayText = processDisplayText(viewer, target, formattedText);
@@ -155,24 +159,20 @@ public class RMBNametags extends JavaPlugin implements Listener {
         }
     }
 
-    // show nickname according to display-location
     private void showConfigured(Player viewer, Player target) {
         String formatted = colorize(nameFormat.replace("{PLAYER_NAME}", target.getName()));
         String displayText = processDisplayText(viewer, target, formatted);
         showText(viewer, displayText);
     }
 
-    // method for apply placeholders and colors
     private String processDisplayText(Player viewer, Player target, String text) {
         if (HAS_PLACEHOLDER) {
             text = PlaceholderAPI.setPlaceholders(target, text);
             text = PlaceholderAPI.setRelationalPlaceholders(viewer, target, text);
         }
-
         return colorize(text);
     }
 
-    // method for show text
     private void showText(Player viewer, String text) {
         switch (displayLocation) {
             case SUBTITLE:
@@ -192,20 +192,14 @@ public class RMBNametags extends JavaPlugin implements Listener {
         }
     }
 
-    // methods for hidden players
-
-    // now not usage
     public boolean hidePlayer(Player player) {
         return hidePlayer(player, null);
     }
 
     public boolean hidePlayer(Player player, String customName) {
-        // if player hidden with config format and no new customName -> false
         if (isPlayerHidden(player) && customName == null && getHiddenPlayerName(player) == null) {
             return false;
         }
-
-        // Null means using format from config
         hiddenPlayers.put(player.getUniqueId(), Objects.requireNonNullElse(customName, ""));
         return true;
     }
@@ -220,16 +214,13 @@ public class RMBNametags extends JavaPlugin implements Listener {
 
     public String getHiddenPlayerName(Player player) {
         String customName = hiddenPlayers.get(player.getUniqueId());
-        // if empty -> null (using format from config)
         return (customName != null && !customName.isEmpty()) ? customName : null;
     }
 
-    // not usage for now
     public Map<UUID, String> getHiddenPlayers() {
         return new HashMap<>(hiddenPlayers);
     }
 
-    // HEX support
     private String colorize(String input) {
         Matcher m = HEX_PATTERN.matcher(input);
         StringBuilder buf = new StringBuilder();

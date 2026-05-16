@@ -17,6 +17,8 @@ display-location: "actionbar"
 # If true, hidden players will still show their custom name when clicked
 show-hidden-players: true
 
+wolf-name-format: "&7[Wolf] &f{WOLF_NAME}"
+
 # Translations
 Messages:
   Reload: "&a&lRMBNametags config reloaded!"
